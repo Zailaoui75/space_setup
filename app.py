@@ -17,7 +17,7 @@ st.subheader("Configuration générale")
 nb_multiplicateurs = st.number_input(
     "Nombre de multiplicateurs (entre 5 et 8)",
     min_value=5,
-    max_value=8,
+    max_value=6,
     value=6,
     step=1,
 )
