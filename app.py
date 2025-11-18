@@ -15,7 +15,7 @@ target_val = 100_000
 # ------------------ Entrées visibles ------------------
 st.subheader("Multiplicateurs (M1..M6)")
 col_w = st.columns(6)
-default_weights_display = [0.4, 1.0, 2.0, 4.0, 10.0, 25.0]  # affichage
+default_weights_display = [0.4, 1.0, 2.0, 3.0, 10.0, 50.0]  # affichage
 weights_display = []
 for i, c in enumerate(col_w):
     with c:
@@ -160,7 +160,7 @@ if st.button("Lancer la recherche"):
         X, exact, best, best_gap = out
         if exact and is_decreasing_positive(X):
             solutions.append((r, X, best_gap))
-            if len(solutions) >= 5:  # Stop à 5 solutions exactes & monotones
+            if len(solutions) >= 10:  # Stop à 5 solutions exactes & monotones
                 break
 
     if solutions:
@@ -176,7 +176,7 @@ if st.button("Lancer la recherche"):
             })
         # Tri par écart-type décroissant
         df = pd.DataFrame(rows).sort_values(by="Écart-type", ascending=False)
-        st.subheader("Jusqu'à 5 solutions trouvées (exactes & monotones) par ecart-type décroissant")
+        st.subheader("Jusqu'à 10 solutions trouvées (exactes & monotones) par ecart-type décroissant")
         st.dataframe(df, use_container_width=True)
     else:
         st.warning("Aucune solution exacte trouvée. Relance la recherche ?")
