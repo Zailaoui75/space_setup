@@ -12,10 +12,25 @@ st.title("Recherche de solutions optimales")
 target_sum = 10_000
 target_val = 100_000
 
+# ------------------ Choix du nombre de multiplicateurs ------------------
+st.subheader("Configuration générale")
+nb_multiplicateurs = st.number_input(
+    "Nombre de multiplicateurs (entre 5 et 8)",
+    min_value=5,
+    max_value=8,
+    value=6,
+    step=1,
+)
+n = int(nb_multiplicateurs)
+
 # ------------------ Entrées visibles ------------------
-st.subheader("Multiplicateurs (M1..M6)")
-col_w = st.columns(6)
-default_weights_display = [0.4, 1.0, 2.0, 3.0, 10.0, 50.0]  # affichage
+st.subheader(f"Multiplicateurs (M1..M{n})")
+
+# Liste de base (on tronque à n). Les 6 premiers sont tes valeurs d'origine.
+base_default_weights_display = [0.4, 1.0, 2.0, 3.0, 10.0, 50.0, 100.0, 200.0]
+default_weights_display = base_default_weights_display[:n]
+
+col_w = st.columns(n)
 weights_display = []
 for i, c in enumerate(col_w):
     with c:
@@ -29,16 +44,22 @@ for i, c in enumerate(col_w):
                 )
             )
         )
+
 # Conversion pour le calcul (on ×10 comme demandé)
 weights = [w * 10.0 for w in weights_display]
 
-st.subheader("Probabilités (entiers / 10000)")
+st.subheader(f"Probabilités (P1..P{n}) — entiers / 10000")
 st.caption("Vous pouvez fixer certaines probabilités, laissez libre sinon")
-col_x = st.columns(6)
+
+col_x = st.columns(n)
 X_FIXED = []
 for i, c in enumerate(col_x):
     with c:
-        s = st.text_input(f"P{i+1}", value="", help="Ex: 6000 signifie 0.6000 ; laisser vide pour libre")
+        s = st.text_input(
+            f"P{i+1}",
+            value="",
+            help="Ex: 6000 signifie 0.6000 ; laisser vide pour libre"
+        )
         s = s.strip()
         if s == "":
             X_FIXED.append(None)
@@ -56,7 +77,8 @@ def is_decreasing_positive(X):
     return all(x > 0 for x in X) and all(X[i] > X[i+1] for i in range(len(X)-1))
 
 def simulate_once():
-    n = 6
+    # n dépend du choix de l'utilisateur
+    n = len(X_FIXED)
     fixed_idx = [i for i, v in enumerate(X_FIXED) if v is not None]
 
     if not fixed_idx:  # Cas 1 : tout libre
@@ -160,7 +182,7 @@ if st.button("Lancer la recherche"):
         X, exact, best, best_gap = out
         if exact and is_decreasing_positive(X):
             solutions.append((r, X, best_gap))
-            if len(solutions) >= 10:  # Stop à 5 solutions exactes & monotones
+            if len(solutions) >= 10:  # Stop à 10 solutions exactes & monotones
                 break
 
     if solutions:
@@ -176,7 +198,10 @@ if st.button("Lancer la recherche"):
             })
         # Tri par écart-type décroissant
         df = pd.DataFrame(rows).sort_values(by="Écart-type", ascending=False)
-        st.subheader("Jusqu'à 10 solutions trouvées (exactes & monotones) par ecart-type décroissant")
+        st.subheader(
+            f"Jusqu'à 10 solutions trouvées (exactes & monotones) par écart-type décroissant "
+            f"(M1..M{n}, P1..P{n})"
+        )
         st.dataframe(df, use_container_width=True)
     else:
         st.warning("Aucune solution exacte trouvée. Relance la recherche ?")
