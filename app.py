@@ -15,7 +15,7 @@ target_val = 100_000
 # ------------------ Choix du nombre de multiplicateurs ------------------
 st.subheader("Configuration générale")
 nb_multiplicateurs = st.number_input(
-    "Nombre de multiplicateurs (entre 5 et 8)",
+    "Nombre de multiplicateurs (entre 5 et 6)",
     min_value=5,
     max_value=6,
     value=6,
